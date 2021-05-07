@@ -3,8 +3,10 @@ from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition
 from rlgym.utils.reward_functions.common_rewards import GoalReward, MoveTowardsBallReward
 from rlgym.utils.reward_functions.combined_reward import *
 from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
-from stable_baselines3 import PPO # pip install stable-baselines3[extra]
+from stable_baselines3 import PPO
+from stable_baselines3 import ppo
 from customized_reward import TimeReward, TouchBallReward
+from cnnLstm_policy import CustomActorCriticPolicy
 
 #The desired number of seconds we would like to wait before terminating an episode.
 ep_len_seconds = 120
@@ -23,7 +25,7 @@ max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip
 # TimeReward: reward -1 for every second
 
 timeout_condition = TimeoutCondition(max_steps)
-reward_function = CombinedReward((TouchBallReward(), GoalReward(per_goal=5.0), MoveTowardsBallReward(), TimeReward()), (0.2, 1.0, 0.1, 1))
+reward_function = CombinedReward((TouchBallReward(), GoalReward(per_goal=5.0), MoveTowardsBallReward(), TimeReward()), (0.2, 1.0, 0.1, 0.1))
 obs_builder = AdvancedObs()
 terminal_conditions = [timeout_condition,]
 
@@ -37,8 +39,8 @@ env = rlgym.make("default",
                  terminal_conditions=terminal_conditions)
 
 #Initialize PPO from stable_baselines3
-model = PPO("MlpPolicy", env=env, verbose=1, device='cuda')
-model.save("attaching_agent")
+model = PPO(CustomActorCriticPolicy, env=env, verbose=1, device='cuda')
+model.save("attack_agent")
 if __name__ == "__main__":
     model.learn(total_timesteps=int(1e6))
     
