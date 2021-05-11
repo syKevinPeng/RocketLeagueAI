@@ -34,6 +34,15 @@ class CustomNetwork(nn.Module):
         # Policy network
         self.policy_net = nn.Sequential(
             nn.Linear(feature_dim, last_layer_dim_pi), nn.ReLU()
+            # nn.Conv2d(feature_dim, 32, kernel_size=8, stride=4, padding=0),
+            # nn.ReLU(),
+            # nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=0),
+            # nn.ReLU(),
+            # nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0),
+            # nn.ReLU(),
+            # nn.Flatten(),
+            # nn.Linear(64, last_layer_dim_pi),
+            # nn.ReLU()
         )
         # Value network
         self.value_net = nn.Sequential(
