@@ -4,6 +4,7 @@ from rlgym.utils import math
 from rlgym.utils.reward_functions import RewardFunction
 from rlgym.utils.common_values import BLUE_TEAM, ORANGE_GOAL_CENTER, BLUE_GOAL_CENTER
 from rlgym.utils.gamestates import GameState, PlayerData
+from stable_baselines3.common import logger
 
 class TimeReward(RewardFunction):
     def __init__(self, per_sec = -0.1):
@@ -50,6 +51,7 @@ class LinearDistanceReward(RewardFunction):
         reward = 12000 - abs(np.linalg.norm(state.ball.position - player.car_data.position))
         if reward < 0:
             raise Exception(f"Linear Distance Rewrad is negative: {reward}")
+        logger.record("reward/linear_distance_reward", reward)
         return reward
 
     def get_final_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
@@ -75,4 +77,16 @@ class LogDistanceReward(RewardFunction):
         return min(max(np.log(np.linalg.norm(state.ball.position - player.car_data.position)), self.min), self.max)
 
     def get_final_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
+        return 0
+
+class MoveTowardsBallReward(RewardFunction):
+    def reset(self, initial_state: GameState, optional_data=None):
+        pass
+
+    def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray, optional_data=None):
+        inv_t = math.scalar_projection(player.car_data.linear_velocity, state.ball.position - player.car_data.position)
+        logger.record("reward/move_to_ball_reward", inv_t)
+        return inv_t
+
+    def get_final_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray, optional_data=None):
         return 0
