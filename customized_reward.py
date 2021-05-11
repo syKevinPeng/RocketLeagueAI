@@ -32,3 +32,47 @@ class TouchBallReward(RewardFunction):
 
     def get_final_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         return 0
+
+
+"""
+Custom linear distance reward function.
+maximium reward is 0. The larger the distance between agent and player, the smaller the reward is.
+"""
+class LinearDistanceReward(RewardFunction):
+    def __init__(self):
+        super().__init__()
+        self.largest_dis = 0
+
+    def reset(self, initial_state: GameState):
+        pass
+
+    def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
+        reward = 12000 - abs(np.linalg.norm(state.ball.position - player.car_data.position))
+        if reward < 0:
+            raise Exception(f"Linear Distance Rewrad is negative: {reward}")
+        return reward
+
+    def get_final_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
+        return 0
+"""
+Custom distance reward function.
+maximium rewrad is 0. The larger the distance between agent and player, the smaller the reward is.
+
+:param min: minimum reward of this function i.e. reward given at very large distance
+:param last_layer_dim_pi: (int) number of units for the last layer of the policy network
+:param last_layer_dim_vf: (int) number of units for the last layer of the value network
+"""
+class LogDistanceReward(RewardFunction):
+    def __init__(self, min, max):
+        super().__init__()
+        self.min = min
+        self.max = max
+
+    def reset(self, initial_state: GameState):
+        pass
+
+    def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
+        return min(max(np.log(np.linalg.norm(state.ball.position - player.car_data.position)), self.min), self.max)
+
+    def get_final_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
+        return 0

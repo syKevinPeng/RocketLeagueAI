@@ -1,11 +1,10 @@
 import rlgym
-from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition
+from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition, GoalScoredCondition
 from rlgym.utils.reward_functions.common_rewards import GoalReward, MoveTowardsBallReward
 from rlgym.utils.reward_functions.combined_reward import *
 from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
 from stable_baselines3 import PPO
-from stable_baselines3 import ppo
-from customized_reward import TimeReward, TouchBallReward
+from customized_reward import TimeReward, TouchBallReward, LinearDistanceReward
 from cnnLstm_policy import CustomActorCriticPolicy
 
 #The desired number of seconds we would like to wait before terminating an episode.
@@ -24,10 +23,10 @@ max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip
 # MoveTowardsGoalReward: ? not sure
 # TimeReward: reward -1 for every second
 
-timeout_condition = TimeoutCondition(max_steps)
-reward_function = CombinedReward((TouchBallReward(), GoalReward(per_goal=5.0), MoveTowardsBallReward(), TimeReward()), (0.2, 1.0, 0.1, 0.1))
+# timeout_condition = TimeoutCondition(max_steps)
+reward_function = CombinedReward((TouchBallReward(),LinearDistanceReward(), GoalReward(per_goal=10000.0), MoveTowardsBallReward(), TimeReward()), (4, 1/1000, 1.0, 0.1, 0.5))
 obs_builder = AdvancedObs()
-terminal_conditions = [timeout_condition,]
+terminal_conditions = [GoalScoredCondition(),]
 
 
 #All we have to do now is pass our custom configuration objects to rlgym!
