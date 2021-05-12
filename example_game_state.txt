@@ -1,0 +1,84 @@
+recieved_state: 
+    {'game_type': 0, 
+    'blue_score': 0, 
+    'orange_score': 0, 
+    'last_touch': -1, 
+    'players': [<rlgym.utils.gamestates.player_data.PlayerData object at 0x000002506F48DDC0>], 
+    'ball': <rlgym.utils.gamestates.physics_object.PhysicsObject object at 0x000002506F48B9D0>, 
+    'inverted_ball': <rlgym.utils.gamestates.physics_object.PhysicsObject object at 0x000002506F48DFA0>, 
+    'boost_pads': array([1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 0., 1., 1., 1., 1., 1., 1.,
+       1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
+      dtype=float32), 
+      'inverted_boost_pads': array([1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+       1., 1., 1., 1., 1., 1., 0., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.],
+      dtype=float32), 
+      'state_str': '8 0 0 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 92.74 0 0 0 0 0 0 -0 -0 92.74 -0 -0 0 -0 -0 0 1 0 -1510.55 -2013.58 17 0.921004 -0.00183693 0.00441025 0.389525 972.511 1000.94 0.101 -0.00051 -0.00021 0.01721 1510.55 2013.58 17 0.389525 0.00441025 0.00183693 -0.921004 -972.511 -1000.94 0.101 0.00051 0.00021 0.01721 0 0 0 0 1 0 1 0 1 0.156408 '}
+
+<rlgym.utils.gamestates.player_data.PlayerData object:
+           {'car_id': 1, 
+            'team_num': 0, 
+            'match_goals': 0, 
+            'match_saves': 0, 
+            'match_shots': 0, 
+            'match_demolishes': 0, 
+            'boost_pickups': 0, 
+            'is_demoed': False, 
+            'on_ground': True, 
+            'ball_touched': False, 
+            'has_flip': True, 
+            'boost_amount': 0.33333298563957214, 
+            'car_data': <rlgym.utils.gamestates.physics_object.PhysicsObject object at 0x000002019D1A4FD0>, 
+            'inverted_car_data': <rlgym.utils.gamestates.physics_object.PhysicsObject object at 0x000002019D1A4520>}
+
+car_data:
+        {'position': array([-2047.98, -2560.02,    17.  ], dtype=float32), 
+        'quaternion': array([ 0.853726  , -0.0024897 ,  0.00409195,  0.5207    ], dtype=float32), 
+        'linear_velocity': array([0.   , 0.   , 0.341], dtype=float32),
+        'angular_velocity': array([-0.00011,  0.     ,  0.     ], dtype=float32), 
+        '_euler_angles': array([0., 0., 0.]), 
+        '_rotation_mtx': array([[0., 0., 0.],
+                                [0., 0., 0.],
+                                [0., 0., 0.]]), 
+        '_has_computed_rot_mtx': False, 
+        '_has_computed_euler_angles': False}
+inverted_car_data
+        {'position': array([2047.98, 2560.02,   17.  ], dtype=float32), 
+        'quaternion': array([ 0.5207    ,  0.00409195,  0.0024897 , -0.853726  ], dtype=float32), 
+        'linear_velocity': array([-0.   , -0.   ,  0.341], dtype=float32), 
+        'angular_velocity': array([ 0.00011, -0.     ,  0.     ], dtype=float32), 
+        '_euler_angles': array([0., 0., 0.]), 
+        '_rotation_mtx': array([[0., 0., 0.],
+                                [0., 0., 0.],
+                                [0., 0., 0.]]), 
+        '_has_computed_rot_mtx': False, 
+        '_has_computed_euler_angles': False}
+
+
+BALL: <rlgym.utils.gamestates.physics_object.PhysicsObject object ...>.__dict__ = 
+       {'position': array([ 0.  ,  0.  , 92.74], dtype=float32), 
+        'quaternion': array([1., 1., 1., 1.]), 
+        'linear_velocity': array([0., 0., 0.], dtype=float32), 
+        'angular_velocity': array([0., 0., 0.], dtype=float32), 
+        '_euler_angles': array([0., 0., 0.]), 
+        '_rotation_mtx': array([[0., 0., 0.],
+                                [0., 0., 0.],
+                                [0., 0., 0.]]), 
+        '_has_computed_rot_mtx': False, 
+        '_has_computed_euler_angles': False}
+
+INV_BALL: <rlgym.utils.gamestates.physics_object.PhysicsObject...>.__dict__ =
+     {'position': array([-0.  , -0.  , 92.74], dtype=float32),
+     'quaternion': array([1., 1., 1., 1.]),
+     'linear_velocity': array([-0., -0.,  0.], dtype=float32),
+     'angular_velocity': array([-0., -0.,  0.], dtype=float32),
+     '_euler_angles': array([0., 0., 0.]),
+     '_rotation_mtx': array([[0., 0., 0.],
+                             [0., 0., 0.],
+                             [0., 0., 0.]]),
+     '_has_computed_rot_mtx': False,
+     '_has_computed_euler_angles': False}
+
+
+
+     1x == 40% GPU
+     100x == 10% GPU
