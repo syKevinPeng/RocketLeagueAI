@@ -159,20 +159,30 @@ exercise_state_obj.set_vals_from_dict(exercise_state_dict)
 # print()
 # print("exercise_state vals:")
 # pprint(exercise_state_obj.__dict__)
+from time import time 
 
 if __name__ == "__main__":
     # Initialize PPO from stable_baselines3
-
+    print(1)
+    env.reset()
+    print(2)
     model = PPO('MlpPolicy', env=env, verbose=1, device='cuda')
+    print(3)
     model.load("attack_agent.zip")
-    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
+    print(4)
+    # mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
+    
     # Enjoy trained agent
+    print("BEFORE")
     obs = env.reset_to_state(exercise_state_obj)
     print("THIS IS OBS:",obs)
+    t = time()
     for i in range(1000):
-        
-        # if i % 100 == 0:
-        #     env.reset_to_state()
+        print(i)
+        # if round(t)%10 == 0:
+
+        if i % 100 == 0:
+            env.reset_to_state(exercise_state_obj)
         action, _states = model.predict(obs, deterministic=True)
         obs, rewards, dones, info = env.step(action)
         # env.render()
