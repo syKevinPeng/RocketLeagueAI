@@ -1,0 +1,12 @@
+name: rocket_league
+channels:
+  - conda-forge
+  - pytorch
+  - anaconda
+dependencies:
+- python=3.8.8
+- cudatoolkit=11.1
+- pytorch
+- pip
+- pip:
+    - stable-baselines3[extra]
