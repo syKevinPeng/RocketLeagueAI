@@ -40,19 +40,21 @@ Custom linear distance reward function.
 maximium reward is 0. The larger the distance between agent and player, the smaller the reward is.
 """
 class LinearDistanceReward(RewardFunction):
-    def __init__(self):
+    def __init__(self, max_reward):
         super().__init__()
         self.largest_dis = 0
+        self.max_reward = max_reward
 
     def reset(self, initial_state: GameState):
         pass
 
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
-        reward = 12000 - abs(np.linalg.norm(state.ball.position - player.car_data.position))
+        max_distance = 12000
+        reward = max_distance - abs(np.linalg.norm(state.ball.position - player.car_data.position))
         if reward < 0:
             raise Exception(f"Linear Distance Rewrad is negative: {reward}")
         logger.record("reward/linear_distance_reward", reward)
-        return reward
+        return self.max_reward*(reward/max_distance)
 
     def get_final_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         return 0

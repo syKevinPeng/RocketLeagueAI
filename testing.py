@@ -6,7 +6,6 @@ from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
 from stable_baselines3 import PPO
 from customized_reward import TimeReward, TouchBallReward, LinearDistanceReward
 from stable_baselines3.common.evaluation import evaluate_policy
-
 #The desired number of seconds we would like to wait before terminating an episode.
 ep_len_seconds = 120
 
@@ -22,8 +21,23 @@ max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip
 # GoalReward: reward for each goal can be controlled via per_goal parameter
 # MoveTowardsGoalReward: ? not sure
 # TimeReward: reward -1 for every second
-
-reward_function = CombinedReward((TouchBallReward(),LinearDistanceReward(), GoalReward(per_goal=10000.0), MoveTowardsBallReward(), TimeReward()), (4, 1/1000, 1.0, 0.1, 0.5))
+reward_weights = {
+'TouchBallReward': 50,
+'LinearDistanceReward': 1/2000,
+'GoalReward': 100,
+'MoveTowardsBallReward':1/300,
+'TimeReward':1
+}
+reward_function = CombinedReward((TouchBallReward(),
+                                  LinearDistanceReward(),
+                                  GoalReward(),
+                                  MoveTowardsBallReward(),
+                                  TimeReward()),
+                                 (reward_weights['TouchBallReward'],
+                                  reward_weights['LinearDistanceReward'],
+                                  reward_weights['GoalReward'],
+                                  reward_weights['MoveTowardsBallReward'],
+                                  reward_weights['TimeReward']))
 obs_builder = AdvancedObs()
 terminal_conditions = [GoalScoredCondition(),TimeoutCondition(max_steps=max_steps)]
 
