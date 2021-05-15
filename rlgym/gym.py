@@ -64,30 +64,47 @@ class Gym(Env):
 
         return self._match.build_observations(state)
 
-    def reset_to_state(self,to_state) -> List:
+    def reset_to_exer_state(self,to_state=None) -> List:
         """
-        The environment reset function. When called, this will reset the state of the environment and objects in the game.
+        The exercise reset function. 
+        
+        When called, this will reset the state of the environment and objects in the game.
         This should be called once when the environment is initialized, then every time the `done` flag from the `step()`
         function is `True`.
         """
 
-        exception = self._comm_handler.send_message(header=Message.RLGYM_RESET_GAME_STATE_MESSAGE_HEADER, body=Message.RLGYM_NULL_MESSAGE_BODY)
-        if exception is not None:
-            self._attempt_recovery()
+        if to_state is None:
             exception = self._comm_handler.send_message(header=Message.RLGYM_RESET_GAME_STATE_MESSAGE_HEADER,
                                                         body=Message.RLGYM_NULL_MESSAGE_BODY)
+        else:
+            exception = self._comm_handler.send_message(header=Message.RLGYM_RESET_TO_SPECIFIC_GAME_STATE_MESSAGE_HEADER,
+                                                        body=to_state)
+
+        if exception is not None:
+            self._attempt_recovery()
+            if to_state is None:
+                exception = self._comm_handler.send_message(header=Message.RLGYM_RESET_GAME_STATE_MESSAGE_HEADER,
+                                                            body=Message.RLGYM_NULL_MESSAGE_BODY)
+            else:
+                exception = self._comm_handler.send_message(
+                    header=Message.RLGYM_RESET_TO_SPECIFIC_GAME_STATE_MESSAGE_HEADER,
+                    body=to_state)
+
             if exception is not None:
                 import sys
                 print("!UNABLE TO RECOVER ROCKET LEAGUE!\nEXITING")
                 sys.exit(-1)
 
-        # state = self._receive_state()
-        self._match.episode_reset(to_state)
-        self._prev_state = to_state
+        # we can assume step() has filled the values needed
+        # Calling _match.episode_reset() is a MISTAKE, we don't want to reset the episode
+        # -----------------------------------
+        state = self._receive_state()
+        # self._match.episode_reset(state)
+        # self._prev_state = state
 
-        return self._match.build_observations(to_state)
+        return self._match.build_observations(state)
 
-    def step(self, actions: Union[np.ndarray, List[np.ndarray], List[float]]) -> Tuple[List, List, bool, Dict]:
+    def step(self, actions: Union[np.ndarray, List[np.ndarray], List[float]], reset_at_term_exer=False, which_exer=None, exercise_reset_states=None) -> Tuple[List, List, bool, Dict]:
         """
         The step function will send the list of provided actions to the game, then advance the game forward by `tick_skip`
         physics ticks using that action. The game is then paused, and the current state is sent back to RLGym. This is
@@ -95,6 +112,7 @@ class Gym(Env):
         next observation, and done signal.
 
         :param actions: A tuple containing N lists of actions, where N is the number of agents interacting with the game.
+        :param reset_at_term: A boolean that tells step to reset_to_state() when 
         :return: A tuple containing (obs, rewards, done, info)
         """
 
@@ -119,8 +137,11 @@ class Gym(Env):
         else:
             state = received_state
 
-        obs = self._match.build_observations(state)
+        if reset_at_term_exer:
+            done_exer, exer_state = self._match.is_done_exer(state,which_exer,exercise_reset_states) or received_state is None or not actions_sent
+        
         done = self._match.is_done(state) or received_state is None or not actions_sent
+        obs = self._match.build_observations(state)
         reward = self._match.get_rewards(state, done)
         self._prev_state = state
 
@@ -129,6 +150,9 @@ class Gym(Env):
             'result': self._match.get_result(state)
         }
 
+        if reset_at_term_exer:
+            return obs, reward, done, (done_exer,exer_state), info
+        
         return obs, reward, done, info
 
     def close(self):

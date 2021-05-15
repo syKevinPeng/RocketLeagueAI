@@ -1,1 +1,2 @@
 from .terminal_condition import TerminalCondition
+from .terminal_condition import ExerciseTerminalCondition

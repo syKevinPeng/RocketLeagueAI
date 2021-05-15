@@ -25,12 +25,12 @@ max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip
 
 reward_function = CombinedReward((TouchBallReward(),LinearDistanceReward(), GoalReward(per_goal=10000.0), MoveTowardsBallReward(), TimeReward()), (4, 1/1000, 1.0, 0.1, 0.5))
 obs_builder = AdvancedObs()
-terminal_conditions = [GoalScoredCondition(),]
+terminal_conditions = [GoalScoredCondition(),TimeoutCondition(max_steps=max_steps)]
 
 if __name__ == "__main__":
     env = rlgym.make("default",
                      spawn_opponents=False,
-                     game_speed=1,
+                     game_speed=20,
                      reward_fn=reward_function,
                      obs_builder=obs_builder,
                      terminal_conditions=terminal_conditions)

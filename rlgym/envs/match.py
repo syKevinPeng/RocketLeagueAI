@@ -118,7 +118,13 @@ class Match(Environment):
 
         return rewards
 
-    def is_done(self, state):
+    def is_done_exer(self, state, which_exer, exercise_reset_states): # can only be list of ExerciseTerminalConditions
+        for condition in self._terminal_conditions:
+            if condition.is_terminal_exer(state):
+                return True, condition.to_next_exer_state(state, which_exer, exercise_reset_states)
+        return False, None
+    
+    def is_done(self, state):  # can be list of TerminalConditions or ExerciseTerminalConditions
         for condition in self._terminal_conditions:
             if condition.is_terminal(state):
                 return True

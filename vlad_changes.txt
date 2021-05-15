@@ -1,0 +1,33 @@
+gym.py
+    lines 150-152:
+        if reset_at_term_exer:
+            done_exer, exer_state = self._match.is_done_exer(state) or received_state is None or not actions_sent
+            return obs, reward, done, (done_exer,exer_state), info
+
+    line 67-105:
+        def reset_to_exer_state(self,to_state=None) -> List:
+            .... no return
+
+match.py
+    lines 121-125:
+        def is_done_exer(self, state): # can only be list of ExerciseTerminalConditions
+            for condition in self._terminal_conditions:
+                if condition.is_terminal_exer(state):
+                    return True, condition.to_next_exer_state(state)
+            return False, None
+
+custom_terminal_consitions.py
+    class ExerciseTimeoutCondition(ExerciseTerminalCondition):
+        ....
+    class ExerciseGoalScoredCondition(ExerciseTerminalCondition):
+        ....
+        HUGE FLAW, see code
+         - temporarily solved by having self._match.is_done_exer() run BEFORE self._match.is_done()
+
+terminal_condition.py
+    class ExerciseTerminalCondition(ABC): # randomize_exer:bool
+            def __init__(self):
+            def reset(self, initial_state: GameState):
+        NEW def to_next_exer_state(self, initial_state: GameState):
+            def is_terminal(self, current_state: GameState) -> bool:
+        NEW def is_terminal_exer(self, current_state: GameState) -> bool:

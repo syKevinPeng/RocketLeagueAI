@@ -15,6 +15,9 @@ class Message(object):
     RLGYM_REQUEST_LAST_BOT_INPUT_MESSAGE_HEADER = "RLGRLBIMH"
     RLGYM_LAST_BOT_INPUT_MESSAGE_HEADER = "RLGLBIMH"
 
+    RLGYM_RESET_TO_SPECIFIC_GAME_STATE_MESSAGE_HEADER = "RLGRTSGSMH"
+
+
 
     def __init__(self, header=None, body=None):
         if header is None:
