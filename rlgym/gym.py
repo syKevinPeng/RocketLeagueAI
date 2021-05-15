@@ -11,7 +11,7 @@ from rlgym.gamelaunch import launch_rocket_league
 from rlgym.communication import CommunicationHandler, Message
 
 class Gym(Env):
-    def __init__(self, match, pipe_id=0, path_to_rl=None, use_injector=False):
+    def __init__(self, match, pipe_id=0, path_to_rl=None, use_injector=False, num_exer=0):
         super().__init__()
 
         self._match = match
@@ -31,6 +31,8 @@ class Gym(Env):
         self._setup_plugin_connection()
 
         self._prev_state = None
+
+        self.num_exer = num_exer
 
     def _open_game(self):
         print("Launching Rocket League, make sure bakkesmod is running.")
@@ -151,6 +153,8 @@ class Gym(Env):
         }
 
         if reset_at_term_exer:
+            # if done_exer: 
+            #     obs = reset_to_exer_state(exer_state)
             return obs, reward, done, (done_exer,exer_state), info
         
         return obs, reward, done, info

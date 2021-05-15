@@ -33,7 +33,7 @@ class ExerciseTimeoutCondition(ExerciseTerminalCondition):
 
     def to_next_exer_state(self, initial_state: GameState, which_exer: int, all_exercises:List[str]):
         """
-        Reset the step counter.
+        Reset the exer step counter.
         Provide reset_state
         """
         self.exer_steps = 0

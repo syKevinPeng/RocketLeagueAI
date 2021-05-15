@@ -4,7 +4,7 @@ from rlgym.utils.reward_functions.common_rewards import GoalReward, MoveTowardsB
 from rlgym.utils.reward_functions.combined_reward import *
 from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
 from stable_baselines3 import PPO
-from customized_reward import TimeReward, TouchBallReward, LinearDistanceReward
+from utils.customized_reward import TimeReward, TouchBallReward, LinearDistanceReward
 from stable_baselines3.common.evaluation import evaluate_policy
 #The desired number of seconds we would like to wait before terminating an episode.
 ep_len_seconds = 120

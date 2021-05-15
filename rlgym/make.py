@@ -13,7 +13,8 @@ def make(env_name: str,
          reward_fn: object = None,
          obs_builder: object = None,
          path_to_rl: str = None,
-         use_injector: bool = False):
+         use_injector: bool = False,
+         num_exer:int = 0):
     """
     :param env_name: Name of your env, can be any of (Custom, Duel, Doubles, Standard, Basic) with or without Self
     :param ep_len_minutes: The episode length in minutes, seconds granularity can be achieved with a float
@@ -46,4 +47,4 @@ def make(env_name: str,
                          "Match ID: {}\n"
                          "Custom match params: {}".format(env_name, custom_args))
 
-    return Gym(match, pipe_id=os.getpid(), path_to_rl=path_to_rl, use_injector=use_injector)
+    return Gym(match, pipe_id=os.getpid(), path_to_rl=path_to_rl, use_injector=use_injector, num_exer=num_exer)

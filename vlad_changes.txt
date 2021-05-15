@@ -31,3 +31,8 @@ terminal_condition.py
         NEW def to_next_exer_state(self, initial_state: GameState):
             def is_terminal(self, current_state: GameState) -> bool:
         NEW def is_terminal_exer(self, current_state: GameState) -> bool:
+
+
+TODO:
+ - DummyVecEnv now __init__() with num_exer
+ - change Monitor to have new params
