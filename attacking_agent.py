@@ -20,16 +20,23 @@ max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip
 # TouchBallReward: get +1 reward when touch ball
 # MoveTowardsBallReward: The projection of linear velocity over distance (maximum value 24.5)
 # GoalReward: reward for each goal can be controlled via per_goal parameter
-# MoveTowardsGoalReward: ? not sure
+# MoveTowardsGoalReward: project of linear velocity over distance
 # TimeReward: reward -1 for every second
 
 reward_weights = {
-'TouchBallReward': 10,
-'LinearDistanceReward': 1/1000,
+'TouchBallReward': 50,
+'LinearDistanceReward': 1/100000,
 'GoalReward': 100,
-'MoveTowardsBallReward':1/100,
+'MoveTowardsBallReward':1/300,
 'TimeReward':1
 }
+# reward_weights = {
+# 'TouchBallReward': 1,
+# 'LinearDistanceReward': 0,
+# 'GoalReward': 5,
+# 'MoveTowardsBallReward':0.1,
+# 'TimeReward':0.1
+# }
 
 # timeout_condition = TimeoutCondition(max_steps)
 reward_function = CombinedReward((TouchBallReward(),
@@ -43,16 +50,17 @@ reward_function = CombinedReward((TouchBallReward(),
                                   reward_weights['MoveTowardsBallReward'],
                                   reward_weights['TimeReward']))
 obs_builder = AdvancedObs()
-terminal_conditions = [GoalScoredCondition(),]
+terminal_conditions = [GoalScoredCondition(),TimeoutCondition()]
 
 
 #All we have to do now is pass our custom configuration objects to rlgym!
 env = rlgym.make("default",
                  spawn_opponents=False,
-                 game_speed=200,
+                 game_speed=1000,
                  reward_fn=reward_function,
                  obs_builder=obs_builder,
-                 terminal_conditions=terminal_conditions)
+                 terminal_conditions=terminal_conditions,
+                 random_resets= True)
 
 #Initialize PPO from stable_baselines3
 model = PPO('MlpPolicy', env=env, verbose=1, device='cuda', tensorboard_log="./logs/")
