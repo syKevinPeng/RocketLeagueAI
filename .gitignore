@@ -1,5 +1,5 @@
 logs/*
-attack_agent.zip
+*.zip
 defend_agent.zip
 BakkesMod/
 .idea

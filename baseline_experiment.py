@@ -1,19 +1,19 @@
-import rlgym
-from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition, GoalScoredCondition
-from rlgym.utils.reward_functions.common_rewards import GoalReward
-from rlgym.utils.reward_functions.combined_reward import *
-from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
 from stable_baselines3 import PPO
-from customized_reward import TimeReward, TouchBallReward, LinearDistanceReward, MoveTowardsBallReward
-from cnnLstm_policy import CustomActorCriticPolicy
 
-#The desired number of seconds we would like to wait before terminating an episode.
+import rlgym
+from customized_reward import TimeReward, TouchBallReward, LinearDistanceReward, MoveTowardsBallReward
+from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
+from rlgym.utils.reward_functions.combined_reward import *
+from rlgym.utils.reward_functions.common_rewards import GoalReward
+from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition, GoalScoredCondition
+
+# The desired number of seconds we would like to wait before terminating an episode.
 ep_len_seconds = 120
 
-#By default, RLGym will repeat every action for 8 physics ticks before waiting for a new action from our agent.
+# By default, RLGym will repeat every action for 8 physics ticks before waiting for a new action from our agent.
 default_tick_skip = 8
 
-#The tick rate of the Rocket League physics engine.
+# The tick rate of the Rocket League physics engine.
 physics_ticks_per_sec = 120
 max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip))
 
@@ -24,11 +24,11 @@ max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip
 # TimeReward: reward -1 for every second
 
 reward_weights = {
-'TouchBallReward': 50,
-'LinearDistanceReward': 1/100000,
-'GoalReward': 100,
-'MoveTowardsBallReward':1/300,
-'TimeReward':1
+    'TouchBallReward': 50,
+    'LinearDistanceReward': 1 / 100000,
+    'GoalReward': 100,
+    'MoveTowardsBallReward': 1 / 300,
+    'TimeReward': 1
 }
 # reward_weights = {
 # 'TouchBallReward': 1,
@@ -50,21 +50,19 @@ reward_function = CombinedReward((TouchBallReward(),
                                   reward_weights['MoveTowardsBallReward'],
                                   reward_weights['TimeReward']))
 obs_builder = AdvancedObs()
-terminal_conditions = [GoalScoredCondition(),TimeoutCondition()]
+terminal_conditions = [GoalScoredCondition(), TimeoutCondition()]
 
-
-#All we have to do now is pass our custom configuration objects to rlgym!
+# All we have to do now is pass our custom configuration objects to rlgym!
 env = rlgym.make("default",
                  spawn_opponents=False,
                  game_speed=1000,
                  reward_fn=reward_function,
                  obs_builder=obs_builder,
                  terminal_conditions=terminal_conditions,
-                 random_resets= True)
+                 random_resets=True)
 
-#Initialize PPO from stable_baselines3
+# Initialize PPO from stable_baselines3
 model = PPO('MlpPolicy', env=env, verbose=1, device='cuda', tensorboard_log="./logs/")
 model.save("attack_agent")
 if __name__ == "__main__":
     model.learn(total_timesteps=int(1e6))
-    

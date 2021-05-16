@@ -41,7 +41,7 @@ class ExerciseTimeoutCondition(ExerciseTerminalCondition):
         if self.randomize_exer:
             self.curr_exercise = all_exercises[random.randint(0, len(all_exercises)-1)]
         else:
-            print("Choosing exer:", which_exer)
+            # print("Choosing exer:", which_exer)
             self.curr_exercise = all_exercises[which_exer]
 
             # # increment which_exer
@@ -100,7 +100,7 @@ class ExerciseGoalScoredCondition(ExerciseTerminalCondition):
         if self.randomize_exer:
             self.curr_exercise = all_exercises[random.randint(0, len(all_exercises)-1)]
         else:
-            print("Choosing exer:", which_exer)
+            # print("Choosing exer:", which_exer)
             self.curr_exercise = all_exercises[which_exer]
 
             # # increment which_exer

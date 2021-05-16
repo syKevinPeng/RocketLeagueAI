@@ -36,25 +36,35 @@ farpostbounce_ball_car_vals =  [ ([500,  3500, 98+1200],[1220,2500,17],[0,rot*(0
 # ------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------
 
-def flip_vals_across_midline_left2right(ball_pos,car_pos,car_orient):
+def flip_vals_across_midline_left2right(ball_pos,player_pos,player_orient):
     ball_pos[0]  *= -1
-    car_pos[0]   *= -1
-    car_orient[2] = rot/2 - car_orient[2]
+    player_pos[0]   *= -1
+    player_orientation = [player_orient[0],
+                          rot - player_orient[1],
+                          player_orient[2]]
 
-    return ball_pos, car_pos, car_orient
+    print("CONVERTING ORIENTATION, before:", player_orient)
+    print("CONVERTING ORIENTATION, after:", player_orientation)
+
+    return ball_pos, player_pos, player_orientation
 
 def ball_car_vals_to_state(ball_car_set, ball_lin_vel=None, 
-                                        ball_ang_vel=None, 
-                                        player_lin_vel=None, 
-                                        player_ang_vel=None):
+                                         ball_ang_vel=None, 
+                                         player_lin_vel=None, 
+                                         player_ang_vel=None,
+                                         flip_across_midline=False):
 
     ball_lin_vel   = ball_lin_vel   if ball_lin_vel   else [0, 0, 0]
     ball_ang_vel   = ball_ang_vel   if ball_ang_vel   else [0, 0, 0]
     player_lin_vel = player_lin_vel if player_lin_vel else [0, 0, 0]
     player_ang_vel = player_ang_vel if player_ang_vel else [0, 0, 0]
-    ball_pos           = ball_car_set[0]
-    player_pos         = ball_car_set[1]
-    player_orientation = ball_car_set[2]
+    
+    if flip_across_midline:
+        ball_pos, player_pos, player_orientation =  flip_vals_across_midline_left2right(ball_car_set[0],ball_car_set[1],ball_car_set[2])
+    else:
+        ball_pos           = ball_car_set[0]
+        player_pos         = ball_car_set[1]
+        player_orientation = ball_car_set[2]
 
     reset_state = player_pos + player_lin_vel + player_ang_vel + player_orientation + \
                 ball_pos   + ball_lin_vel   + ball_ang_vel
@@ -70,8 +80,10 @@ def some_examples(num_examples):
 
     return examples[0:num_examples] # filter, then sum(examples,[]) to flatten
 
-def convert_exercises(exercises_list: List[Tuple[List]]):
+def convert_exercises(exercises_list: List[Tuple[List]],flip_across_midline=False):
     # ([ball_pos],[car_pos],[car_orient])
-    exercise_reset_states = [ball_car_vals_to_state(x) for x in exercises_list] 
+    exercise_reset_states = [ball_car_vals_to_state(x,flip_across_midline=flip_across_midline) 
+                                for x in exercises_list
+                            ] 
 
     return exercise_reset_states

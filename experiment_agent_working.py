@@ -66,13 +66,6 @@ reward_weights = {
 'MoveTowardsBallReward':1/300,
 'TimeReward':1
 }
-# reward_weights = {
-# 'TouchBallReward': 1,
-# 'LinearDistanceReward': 0,
-# 'GoalReward': 5,
-# 'MoveTowardsBallReward':0.1,
-# 'TimeReward':0.1
-# }
 
 # timeout_condition = TimeoutCondition(max_steps)
 reward_function = CombinedReward((TouchBallReward(),
