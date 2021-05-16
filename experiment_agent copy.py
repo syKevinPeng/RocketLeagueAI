@@ -62,13 +62,6 @@ reward_weights = {
 'MoveTowardsBallReward':1/300,
 'TimeReward':1
 }
-# reward_weights = {
-# 'TouchBallReward': 1,
-# 'LinearDistanceReward': 0,
-# 'GoalReward': 5,
-# 'MoveTowardsBallReward':0.1,
-# 'TimeReward':0.1
-# }
 
 # timeout_condition = TimeoutCondition(max_steps)
 reward_function = CombinedReward((TouchBallReward(),
@@ -88,7 +81,7 @@ terminal_conditions = [exer_goalscored_condition,exer_timeout_condition] # [Goal
 #All we have to do now is pass our custom configuration objects to rlgym!
 env = rlgym.make("default",
                  spawn_opponents=False,
-                 game_speed=1.5,
+                 game_speed=1000,
                  reward_fn=reward_function,
                  obs_builder=obs_builder,
                  terminal_conditions=terminal_conditions,
@@ -97,8 +90,8 @@ env = rlgym.make("default",
 
 #Initialize PPO from stable_baselines3
 model = PPO('MlpPolicy', env=env, verbose=1, device='cuda', tensorboard_log="./logs/")
-model.save("attack_agent")
 
 if __name__ == "__main__":
     model.learn(total_timesteps=int(1e6))
+    model.save("experiment_3")
     # custom_learn(model,total_timesteps=int(1e6))
