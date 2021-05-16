@@ -17,87 +17,12 @@ from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback#, Schedu
 from stable_baselines3.common.utils import safe_mean # obs_as_tensor, safe_mean
 from stable_baselines3.common.vec_env import VecEnv
 
+from utils.give_exercises import convert_exercises
+
 import time
 import numpy as np
 import torch as th
 import gym
-
-
-# def custom_collect_rollouts(
-#         model,
-#         env: VecEnv,
-#         callback: BaseCallback,
-#         rollout_buffer: RolloutBuffer,
-#         n_rollout_steps: int,
-#     ) -> bool:
-#         """
-#         Collect experiences using the current policy and fill a ``RolloutBuffer``.
-#         The term rollout here refers to the model-free notion and should not
-#         be used with the concept of rollout used in model-based RL or planning.
-
-#         :param env: The training environment
-#         :param callback: Callback that will be called at each step
-#             (and at the beginning and end of the rollout)
-#         :param rollout_buffer: Buffer to fill with rollouts
-#         :param n_steps: Number of experiences to collect per environment
-#         :return: True if function returned with at least `n_rollout_steps`
-#             collected, False if callback terminated rollout prematurely.
-#         """
-#         assert model._last_obs is not None, "No previous observation was provided"
-#         n_steps = 0
-#         rollout_buffer.reset()
-#         # Sample new weights for the state dependent exploration
-#         if model.use_sde:
-#             model.policy.reset_noise(env.num_envs)
-
-#         callback.on_rollout_start()
-
-#         while n_steps < n_rollout_steps:
-#             if model.use_sde and model.sde_sample_freq > 0 and n_steps % model.sde_sample_freq == 0:
-#                 # Sample a new noise matrix
-#                 model.policy.reset_noise(env.num_envs)
-
-#             with th.no_grad():
-#                 # Convert to pytorch tensor or to TensorDict
-#                 obs_tensor = obs_as_tensor(model._last_obs, model.device)
-#                 actions, values, log_probs = model.policy.forward(obs_tensor)
-#             actions = actions.cpu().numpy()
-
-#             # Rescale and perform action
-#             clipped_actions = actions
-#             # Clip the actions to avoid out of bound error
-#             if isinstance(model.action_space, gym.spaces.Box):
-#                 clipped_actions = np.clip(actions, model.action_space.low, model.action_space.high)
-
-#             new_obs, rewards, dones, infos = env.step(clipped_actions)
-
-#             model.num_timesteps += env.num_envs
-
-#             # Give access to local variables
-#             callback.update_locals(locals())
-#             if callback.on_step() is False:
-#                 return False
-
-#             model._update_info_buffer(infos)
-#             n_steps += 1
-
-#             if isinstance(model.action_space, gym.spaces.Discrete):
-#                 # Reshape in case of discrete action
-#                 actions = actions.reshape(-1, 1)
-#             rollout_buffer.add(model._last_obs, actions, rewards, model._last_episode_starts, values, log_probs)
-#             model._last_obs = new_obs
-#             model._last_episode_starts = dones
-
-#         with th.no_grad():
-#             # Compute value for the last timestep
-#             obs_tensor = obs_as_tensor(new_obs, model.device)
-#             _, values, _ = model.policy.forward(obs_tensor)
-
-#         rollout_buffer.compute_returns_and_advantage(last_values=values, dones=dones)
-
-#         callback.on_rollout_end()
-
-#         return True
 
 def custom_collect_rollouts(
         model, env: VecEnv, callback: BaseCallback, rollout_buffer: RolloutBuffer, n_rollout_steps: int
@@ -154,7 +79,12 @@ def custom_collect_rollouts(
                                                                    which_exer=0, 
                                                                    exercise_reset_states=[([0, 5000, 98],[400,4900,17],[0,rot,0])])
 
-        if done_exer: new_obs = env.reset_to_exer_state(exer_state)
+        
+        if done_exer: 
+            print("ABOUT TO RESET", exer_state)
+            # exer_state = sum(exer_state,[])
+            exer_state = convert_exercises(exer_state)
+            new_obs = env.reset_to_exer_state(exer_state)
 
         # ------------------------------------------------------------------------------------------
         # ------------------------------------------------------------------------------------------

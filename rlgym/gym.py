@@ -11,7 +11,7 @@ from rlgym.gamelaunch import launch_rocket_league
 from rlgym.communication import CommunicationHandler, Message
 
 class Gym(Env):
-    def __init__(self, match, pipe_id=0, path_to_rl=None, use_injector=False, num_exer=0):
+    def __init__(self, match, pipe_id=0, path_to_rl=None, use_injector=False, num_exer=0, reset_at_term_exer=False, exercise_reset_states=None):
         super().__init__()
 
         self._match = match
@@ -33,6 +33,9 @@ class Gym(Env):
         self._prev_state = None
 
         self.num_exer = num_exer
+        self.which_exer = 0
+        self.reset_at_term_exer = reset_at_term_exer
+        self.exercise_reset_states = exercise_reset_states
 
     def _open_game(self):
         print("Launching Rocket League, make sure bakkesmod is running.")
@@ -106,7 +109,7 @@ class Gym(Env):
 
         return self._match.build_observations(state)
 
-    def step(self, actions: Union[np.ndarray, List[np.ndarray], List[float]], reset_at_term_exer=False, which_exer=None, exercise_reset_states=None) -> Tuple[List, List, bool, Dict]:
+    def step(self, actions: Union[np.ndarray, List[np.ndarray], List[float]]) -> Tuple[List, List, bool, Dict]:
         """
         The step function will send the list of provided actions to the game, then advance the game forward by `tick_skip`
         physics ticks using that action. The game is then paused, and the current state is sent back to RLGym. This is
@@ -139,8 +142,8 @@ class Gym(Env):
         else:
             state = received_state
 
-        if reset_at_term_exer:
-            done_exer, exer_state = self._match.is_done_exer(state,which_exer,exercise_reset_states) or received_state is None or not actions_sent
+        if self.reset_at_term_exer:
+            done_exer, exer_state = self._match.is_done_exer(state, self.which_exer, self.exercise_reset_states) or received_state is None or not actions_sent
         
         done = self._match.is_done(state) or received_state is None or not actions_sent
         obs = self._match.build_observations(state)
@@ -152,10 +155,14 @@ class Gym(Env):
             'result': self._match.get_result(state)
         }
 
-        if reset_at_term_exer:
-            # if done_exer: 
-            #     obs = reset_to_exer_state(exer_state)
-            return obs, reward, done, (done_exer,exer_state), info
+        if self.reset_at_term_exer:
+            if done_exer: 
+                obs = self.reset_to_exer_state(exer_state)
+            if done or done_exer:
+                # increment which_exer
+                if self.which_exer < len(self.exercise_reset_states)-1: self.which_exer += 1
+                else: self.which_exer = 0
+            # return obs, reward, done, (done_exer,exer_state), info
         
         return obs, reward, done, info
 

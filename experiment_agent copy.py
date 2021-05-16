@@ -4,11 +4,13 @@ from rlgym.utils.reward_functions.common_rewards import GoalReward
 from rlgym.utils.reward_functions.combined_reward import *
 from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
 
-from utils.new_ppo.custom_ppo  import PPO
+# from utils.new_ppo.custom_ppo  import PPO
 from utils.customized_reward import TimeReward, TouchBallReward, LinearDistanceReward, MoveTowardsBallReward
 from utils.cnnLstm_policy import CustomActorCriticPolicy
 from utils.new_ppo.custom_learn import custom_learn
 from utils.custom_terminal_conditions import ExerciseTimeoutCondition, ExerciseGoalScoredCondition
+
+from stable_baselines3 import PPO
 
 #The desired number of seconds we would like to wait before terminating an episode.
 ep_len_seconds = 120
@@ -76,5 +78,5 @@ model = PPO('MlpPolicy', env=env, verbose=1, device='cuda', tensorboard_log="./l
 model.save("attack_agent")
 
 if __name__ == "__main__":
-    # model.learn(total_timesteps=int(1e6))
-    custom_learn(model,total_timesteps=int(1e6))
+    model.learn(total_timesteps=int(1e6))
+    # custom_learn(model,total_timesteps=int(1e6))

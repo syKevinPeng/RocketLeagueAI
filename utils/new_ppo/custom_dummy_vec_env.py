@@ -33,8 +33,8 @@ class DummyVecEnv(VecEnv):
         self.buf_rews = np.zeros((self.num_envs,), dtype=np.float32)
         self.buf_infos = [{} for _ in range(self.num_envs)]
 
-        self.buf_done_exer  = np.zeros((self.num_envs,), dtype=bool)
-        self.buf_exer_state = np.zeros((self.num_envs,num_exer), dtype="S80")
+        self.buf_done_exer  = "" # np.zeros((self.num_envs,), dtype=bool)
+        self.buf_exer_state = None # np.zeros((self.num_envs,num_exer), dtype="S80")
 
         self.actions = None
         self.metadata = env.metadata
@@ -51,6 +51,9 @@ class DummyVecEnv(VecEnv):
         return self.step_wait(reset_at_term_exer=reset_at_term_exer,
                                 which_exer=which_exer,
                                 exercise_reset_states=exercise_reset_states)
+
+    def reset_to_exer_state(self,state):
+        return self.envs[0].reset_to_exer_state(state)
         
     def step_async(self, actions: np.ndarray) -> None:
         self.actions = actions
@@ -61,19 +64,17 @@ class DummyVecEnv(VecEnv):
             # print('env and env type: ',self.envs[env_idx],type(self.envs[env_idx]))
 
             if reset_at_term_exer:
-                temp_str = ""
-                temp_done_exer = False
                 # obs, self.buf_rews[env_idx], self.buf_dones[env_idx], (self.buf_done_exer[env_idx],self.buf_exer_state[env_idx]), self.buf_infos[env_idx] = self.envs[env_idx].step(
-                obs, self.buf_rews[env_idx], self.buf_dones[env_idx], (temp_done_exer, temp_str), self.buf_infos[env_idx] = self.envs[env_idx].step(
+                obs, self.buf_rews[env_idx], self.buf_dones[env_idx], (self.buf_done_exer, self.buf_exer_state), self.buf_infos[env_idx] = self.envs[env_idx].step(
                     self.actions[env_idx],
                     reset_at_term_exer,
                     which_exer,
                     exercise_reset_states
                 )
-                print("EXERCISE BEFORE:  ",exercise_reset_states)
-                print()
-                print("EXERCISE AFTER:  ",temp_str,temp_done_exer)
-                print()
+                # print("EXERCISE BEFORE:  ",exercise_reset_states)
+                # print()
+                # print("EXERCISE AFTER:  ",self.buf_done_exer, self.buf_exer_state)
+                # print()
             
                 # print("dummy_vec LENGTH:",len([obs, self.buf_rews[env_idx], self.buf_dones[env_idx], (self.buf_done_exer[env_idx],self.buf_exer_state[env_idx]), self.buf_infos[env_idx]]))
             else:
@@ -87,8 +88,8 @@ class DummyVecEnv(VecEnv):
                 obs = self.envs[env_idx].reset()
             self._save_obs(env_idx, obs)
 
-            if reset_at_term_exer:
-                return (self._obs_from_buf(), np.copy(self.buf_rews), np.copy(self.buf_dones), (np.copy(self.buf_done_exer[env_idx]),np.copy(self.buf_exer_state[env_idx])), deepcopy(self.buf_infos))
+        if reset_at_term_exer:
+            return (self._obs_from_buf(), np.copy(self.buf_rews), np.copy(self.buf_dones), (np.copy(self.buf_done_exer),np.copy(self.buf_exer_state)), deepcopy(self.buf_infos))
             
         return (self._obs_from_buf(), np.copy(self.buf_rews), np.copy(self.buf_dones), deepcopy(self.buf_infos))
 

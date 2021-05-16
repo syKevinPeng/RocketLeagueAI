@@ -85,6 +85,9 @@ class Monitor(gym.Wrapper):
             self.current_reset_info[key] = value
         return self.env.reset(**kwargs)
 
+    def reset_to_exer_state(self,state):
+        return self.env.reset_to_exer_state(state)
+
     def step(self, action: Union[np.ndarray, int], reset_at_term_exer=False, which_exer=None, exercise_reset_states=None) -> GymStepReturn:
         """
         Step the environment with the given action
