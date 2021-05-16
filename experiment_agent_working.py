@@ -18,11 +18,15 @@ from stable_baselines3 import PPO
 exercises = some_examples(num_examples=4)
 exercises.pop(2) # remove slightlyoffset_ball_car_vals
 exercises = sum(exercises,[]) # flatten
-exercise_reset_states = convert_exercises(exercises)
+
+exercise_reset_states = convert_exercises(exercises, flip_across_midline=False)
+exercise_reset_states_flip = convert_exercises(exercises, flip_across_midline=True)
+all_exercises = exercise_reset_states + exercise_reset_states_flip
 
 # helper vars for resetting exercises
-num_exer = len(exercise_reset_states)
-max_goals_per_episode = 9
+from math import inf 
+num_exer = len(all_exercises)
+max_goals_per_episode = inf
 which_exer = 0
 
 #The desired number of seconds for each exercise
@@ -88,17 +92,17 @@ terminal_conditions = [exer_goalscored_condition,exer_timeout_condition] # [Goal
 #All we have to do now is pass our custom configuration objects to rlgym!
 env = rlgym.make("default",
                  spawn_opponents=False,
-                 game_speed=1.5,
+                 game_speed=5e5,
                  reward_fn=reward_function,
                  obs_builder=obs_builder,
                  terminal_conditions=terminal_conditions,
                  reset_at_term_exer=True,
-                 exercise_reset_states=exercise_reset_states)
+                 exercise_reset_states=all_exercises)
 
 #Initialize PPO from stable_baselines3
 model = PPO('MlpPolicy', env=env, verbose=1, device='cuda', tensorboard_log="./logs/")
-model.save("attack_agent")
 
 if __name__ == "__main__":
-    model.learn(total_timesteps=int(1e6))
+    model.learn(total_timesteps=int(39e5))
+    model.save("attack_agent_Vlad_39e5")
     # custom_learn(model,total_timesteps=int(1e6))
