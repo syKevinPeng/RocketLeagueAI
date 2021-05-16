@@ -11,7 +11,7 @@ from rlgym.gamelaunch import launch_rocket_league
 from rlgym.communication import CommunicationHandler, Message
 
 class Gym(Env):
-    def __init__(self, match, pipe_id=0, path_to_rl=None, use_injector=False, num_exer=0, reset_at_term_exer=False, exercise_reset_states=None):
+    def __init__(self, match, pipe_id=0, path_to_rl=None, use_injector=False, reset_at_term_exer=False, exercise_reset_states=None):
         super().__init__()
 
         self._match = match
@@ -32,7 +32,6 @@ class Gym(Env):
 
         self._prev_state = None
 
-        self.num_exer = num_exer
         self.which_exer = 0
         self.reset_at_term_exer = reset_at_term_exer
         self.exercise_reset_states = exercise_reset_states
