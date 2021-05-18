@@ -1,51 +1,35 @@
 import rlgym
 from rlgym.utils.terminal_conditions.common_conditions import TimeoutCondition, GoalScoredCondition
-from rlgym.utils.reward_functions.common_rewards import GoalReward, MoveTowardsBallReward
+from rlgym.utils.reward_functions.common_rewards import GoalReward
 from rlgym.utils.reward_functions.combined_reward import *
 from rlgym.utils.obs_builders.advanced_obs import AdvancedObs
-from stable_baselines3 import PPO
-from utils.customized_reward import TimeReward, TouchBallReward, LinearDistanceReward
-from stable_baselines3.common.evaluation import evaluate_policy
-<<<<<<< HEAD
+
+from utils.customized_reward import TimeReward, TouchBallReward, LinearDistanceReward, MoveTowardsBallReward
+from utils.cnnLstm_policy import CustomActorCriticPolicy
 from utils.custom_terminal_conditions import ExerciseTimeoutCondition, ExerciseGoalScoredCondition
 from utils.give_exercises import some_examples
 from utils.give_exercises import convert_exercises
 
-=======
-from utils.give_exercises import some_examples
-from utils.give_exercises import convert_exercises
-from utils.custom_terminal_conditions import ExerciseTimeoutCondition, ExerciseGoalScoredCondition
->>>>>>> f9ac41713192dc1a40606311a4f097e2a1d8bc29
+from stable_baselines3 import PPO
 
 # reset states for exercises
 exercises = some_examples(num_examples=4)
 exercises.pop(2) # remove slightlyoffset_ball_car_vals
-<<<<<<< HEAD
-# exercises.pop(2) # remove farpostbounce_ball_car_vals
 exercises = sum(exercises,[]) # flatten
+
 exercise_reset_states = convert_exercises(exercises, flip_across_midline=False)
 exercise_reset_states_flip = convert_exercises(exercises, flip_across_midline=True)
 all_exercises = exercise_reset_states + exercise_reset_states_flip
 
 # helper vars for resetting exercises
-from math import inf
-num_exer = len(exercise_reset_states)
+from math import inf 
+num_exer = len(all_exercises)
 max_goals_per_episode = inf
 which_exer = 0
 
 #The desired number of seconds for each exercise
 exer_len_seconds = 10 # must be greater than 3, will not work during countdown
 
-=======
-exercises = sum(exercises,[]) # flatten
-exercise_reset_states = convert_exercises(exercises)
-
-# helper vars for resetting exercises
-num_exer = len(exercise_reset_states)
-max_goals_per_episode = 9
-which_exer = 0
-exer_len_seconds = 10
->>>>>>> f9ac41713192dc1a40606311a4f097e2a1d8bc29
 #The desired number of seconds we would like to wait before terminating an episode.
 ep_len_seconds = exer_len_seconds*num_exer
 
@@ -56,7 +40,6 @@ default_tick_skip = 8
 physics_ticks_per_sec = 120
 max_steps = int(round(ep_len_seconds * physics_ticks_per_sec / default_tick_skip))
 exer_steps = int(round(exer_len_seconds * physics_ticks_per_sec / default_tick_skip))
-<<<<<<< HEAD
 
 which_exer = 0
 # timeout_condition = TimeoutCondition(max_steps=)
@@ -68,13 +51,12 @@ exer_timeout_condition = ExerciseTimeoutCondition(max_steps=max_steps,       # n
 exer_goalscored_condition = ExerciseGoalScoredCondition(max_episode_goals=max_goals_per_episode, 
                                                         randomize_exer=False)
 
-=======
->>>>>>> f9ac41713192dc1a40606311a4f097e2a1d8bc29
 # TouchBallReward: get +1 reward when touch ball
 # MoveTowardsBallReward: The projection of linear velocity over distance (maximum value 24.5)
 # GoalReward: reward for each goal can be controlled via per_goal parameter
-# MoveTowardsGoalReward: ? not sure
+# MoveTowardsGoalReward: project of linear velocity over distance
 # TimeReward: reward -1 for every second
+
 reward_weights = {
 'TouchBallReward': 50,
 'LinearDistanceReward': 1/100000,
@@ -83,12 +65,9 @@ reward_weights = {
 'TimeReward':1
 }
 
+# timeout_condition = TimeoutCondition(max_steps)
 reward_function = CombinedReward((TouchBallReward(),
-<<<<<<< HEAD
                                   LinearDistanceReward(max_reward=2),
-=======
-                                  LinearDistanceReward(2),
->>>>>>> f9ac41713192dc1a40606311a4f097e2a1d8bc29
                                   GoalReward(),
                                   MoveTowardsBallReward(),
                                   TimeReward(per_sec=-1.0)),
@@ -98,45 +77,27 @@ reward_function = CombinedReward((TouchBallReward(),
                                   reward_weights['MoveTowardsBallReward'],
                                   reward_weights['TimeReward']))
 obs_builder = AdvancedObs()
-<<<<<<< HEAD
 terminal_conditions = [exer_goalscored_condition,exer_timeout_condition] # [GoalScoredCondition(),TimeoutCondition()]
-=======
-exer_timeout_condition = ExerciseTimeoutCondition(max_steps=max_steps,       # num_steps before episode resets
-                                                  max_exer_steps=exer_steps, # num_steps before exercise repeats
-                                                  randomize_exer=False)
-exer_goalscored_condition = ExerciseGoalScoredCondition(max_episode_goals=max_goals_per_episode,
-                                                        randomize_exer=False)
-terminal_conditions = [exer_goalscored_condition,exer_timeout_condition]
->>>>>>> f9ac41713192dc1a40606311a4f097e2a1d8bc29
+
+
+#All we have to do now is pass our custom configuration objects to rlgym!
+env = rlgym.make("default",
+                 spawn_opponents=False,
+                 game_speed=5e5,
+                 reward_fn=reward_function,
+                 obs_builder=obs_builder,
+                 terminal_conditions=terminal_conditions,
+                 reset_at_term_exer=True,
+                 exercise_reset_states=all_exercises)
+
+#Initialize PPO from stable_baselines3
+model = PPO('MlpPolicy', env=env, verbose=1, device='cuda', tensorboard_log="./logs/")
 
 if __name__ == "__main__":
-    env = rlgym.make("default",
-                     spawn_opponents=False,
-<<<<<<< HEAD
-                     game_speed=2,
-=======
-                     game_speed=1,
->>>>>>> f9ac41713192dc1a40606311a4f097e2a1d8bc29
-                     reward_fn=reward_function,
-                     obs_builder=obs_builder,
-                     terminal_conditions=terminal_conditions,
-                     reset_at_term_exer=True,
-<<<<<<< HEAD
-                     exercise_reset_states=all_exercises)
-    # Initialize PPO from stable_baselines3
-    model = PPO('MlpPolicy', env=env, device='cuda')
-    model.load("attack_agent_Vlad.zip")
-    # mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
-=======
-                     exercise_reset_states=exercise_reset_states)
-    # Initialize PPO from stable_baselines3
-    model = PPO('MlpPolicy', env=env, device='cuda')
-    model.load("experiment_3.zip")
-    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
->>>>>>> f9ac41713192dc1a40606311a4f097e2a1d8bc29
-    # Enjoy trained agent
-    obs = env.reset()
-    for i in range(5000):
-        action, _states = model.predict(obs, deterministic=True)
-        obs, rewards, dones, info = env.step(action)
-        # env.render()
+    save_name = None
+    time_steps = 0 # 39e5
+    assert(save_name is not None and time_steps != 0)
+
+    model.learn(total_timesteps=int(time_steps))
+    model.save("./models/{}".format(save_name))
+    # custom_learn(model,total_timesteps=int(1e6))
